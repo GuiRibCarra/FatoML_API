@@ -45,23 +45,25 @@
       border-radius: 20px;
       cursor: pointer;
     }
-    .play-button-modelos-true {
+    .play-button-modelo {
       margin-top: 20px;
       padding: 10px 20px;
-      background-color: green;
       color: white;
       border: none;
       border-radius: 20px;
       cursor: pointer;
+      background-color: #6c757d; /* Uma cor neutra/padrão */
+      transition: background-color 0.3s ease;
     }
-    .play-button-modelos-false {
-      margin-top: 20px;
-      padding: 10px 20px;
+
+    /* Classe para resultado VERDADEIRO */
+    .play-button-modelo.resultado-true {
+      background-color: green;
+    }
+
+    /* Classe para resultado FALSO */
+    .play-button-modelo.resultado-false {
       background-color: red;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
     }
     .textarea {
       margin-top: 30px;
@@ -143,16 +145,16 @@
       to {opacity: 1;}
     }
       .carousel-intro {
-  backdrop-filter: brightness(0.6);
-  background-color: rgba(0, 0, 0, 0.6);
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.7);
-  padding: 40px;
-  font-size: 42px;
-  line-height: 1.8;
-  border-radius: 10px;
-  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9);
-}
-  
+        backdrop-filter: brightness(0.6);
+        background-color: rgba(0, 0, 0, 0.6);
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.7);
+        padding: 40px;
+        font-size: 42px;
+        line-height: 1.8;
+        border-radius: 10px;
+        text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9);
+    }
+
 
     .modelo-btn:hover {
       background-color: #0056b3;
@@ -176,9 +178,11 @@
     }
  </style>
   <script>
-
     function enviarParaModelos() {
     const texto = document.querySelector(".textarea-news").value;
+
+    // Limpa os resultados antigos antes de fazer a nova requisição
+    limparClassesDeTodosModelos();
 
     fetch("http://127.0.0.1:5000/prever", {
         method: "POST",
@@ -189,32 +193,33 @@
     })
     .then(response => response.json())
     .then(data => {
-        // Ex: data = { "rfc": 0, "svc": 1, "logreg": 1, "dtc": 0, "pac": 1 }
-        const botoes = document.querySelectorAll(".play-button-modelos");
+        console.log("Dados recebidos da API:", data);
+        for (const nomeModelo in data) {
+            const botao = document.querySelector(`.play-button-modelo[data-modelo="${nomeModelo}"]`);
 
-        botoes.forEach((botao, index) => {
-            const nomesModelos = ["rfc", "svc", "logreg", "dtc", "pac"];
-            const nomeModelo = nomesModelos[index];
+            if (botao) {
+                const resultado = data[nomeModelo]; // Pega o valor (0 ou 1)
 
-            botao.classList.remove("true", "false");
-
-            if (data[nomeModelo] === 1) {
-                botao.classList.add("-true");
-            } else if (data[nomeModelo] === 0) {
-                botao.classList.add("-false");
+                if (resultado === 1) {
+                    botao.classList.add("resultado-true");
+                } else {
+                    botao.classList.add("resultado-false");
+                }
             }
-        });
+        }
     })
     .catch(error => {
         console.error("Erro ao enviar para API:", error);
+        alert("Ocorreu um erro ao classificar a notícia. Verifique o console para mais detalhes.");
     });
 }
 
+// Corrigindo a função de limpeza
 function limparClassesDeTodosModelos() {
-    const botoes = document.querySelectorAll(".play-button-modelos");
+    const botoes = document.querySelectorAll(".play-button-modelo");
 
     botoes.forEach(botao => {
-        botao.classList.remove("-true", "-false");
+        botao.classList.remove("resultado-true", "resultado-false");
     });
 }
 
@@ -236,9 +241,9 @@ function limparClassesDeTodosModelos() {
 
     let idx = 0;
     const bgImagens = [
-      "https://i.imgur.com/E0DMP01.jpeg",
-      "https://i.imgur.com/ixFyVJs.jpeg",
-      "https://i.imgur.com/n3KnaWX.jpeg"
+      "{{ url_for('static', filename='imagens/news ia.png') }}",
+      "{{ url_for('static', filename='imagens/modelos.png') }}",
+      "{{ url_for('static', filename='imagens/stop.png') }}"
     ];
     setInterval(() => {
       const slide = document.getElementById("slide");
@@ -272,7 +277,7 @@ function limparClassesDeTodosModelos() {
         slideModelos.textContent = mensagensModelos[index];
       }
       if (carouselModelos) {
-        carouselModelos.style.backgroundImage = "url('https://i.imgur.com/wsStX3y.png')";
+        carouselModelos.style.backgroundImage = "url('{{ url_for('static', filename='imagens/carrosel.png') }}')";
       }
     }
   </script>
@@ -282,7 +287,7 @@ function limparClassesDeTodosModelos() {
 <!-- Página 1: Home -->
 <div id="pagina1">
   <header>
-    <div><img src="https://i.imgur.com/Ip6Z6EY.png" alt="Logo FatoML" style="height: 40px; vertical-align: middle;cursor: pointer;" onclick="limparClassesDeTodosModelos();irParaPagina('pagina1');"></div>
+    <div><img src="{{ url_for('static', filename='imagens/logo.png') }}" loading="lazy" alt="Logo FatoML" style="height: 40px; vertical-align: middle;cursor: pointer;" onclick="limparClassesDeTodosModelos();irParaPagina('pagina1');"></div>
     <div class="stars">
       <div class="nav-item" onclick="irParaPagina('pagina2')"><span class="nav-star">🧠</span><span>Classificar</span></div>
       <div class="nav-item" onclick="irParaPagina('pagina4')"><span class="nav-star">🧠</span><span>Sobre mim</span></div>
@@ -311,7 +316,7 @@ function limparClassesDeTodosModelos() {
 <!-- Página 2: Classificar -->
 <div id="pagina2" style="display:none;">
   <header>
-    <div><img src="https://i.imgur.com/Ip6Z6EY.png" alt="Logo FatoML" style="height: 40px;vertical-align: middle;cursor: pointer;" onclick="limparClassesDeTodosModelos();irParaPagina('pagina1');"></div>
+    <div><img src="{{ url_for('static', filename='imagens/logo.png') }}" alt="Logo FatoML" style="height: 40px;vertical-align: middle;cursor: pointer;" onclick="limparClassesDeTodosModelos();irParaPagina('pagina1');"></div>
     <div class="stars">
       <div class="nav-item" onclick="irParaPagina('pagina2')"><span class="nav-star">🧠</span><span>Classificar</span></div>
       <div class="nav-item" onclick="irParaPagina('pagina4')"><span class="nav-star">🧠</span><span>Sobre mim</span></div>
@@ -328,7 +333,7 @@ function limparClassesDeTodosModelos() {
 <!-- Página 3: Resultados -->
 <div id="pagina3" style="display:none;">
   <header>
-    <div><img src="https://i.imgur.com/Ip6Z6EY.png" alt="Logo FatoML" style="height: 40px;vertical-align: middle;cursor: pointer;" onclick="limparClassesDeTodosModelos();irParaPagina('pagina1');"></div>
+    <div><img src="{{ url_for('static', filename='imagens/logo.png') }}" alt="Logo FatoML" style="height: 40px;vertical-align: middle;cursor: pointer;" onclick="limparClassesDeTodosModelos();irParaPagina('pagina1');"></div>
     <div class="stars">
       <div class="nav-item" onclick="irParaPagina('pagina2')"><span class="nav-star">🧠</span><span>Classificar</span></div>
       <div class="nav-item" onclick="irParaPagina('pagina4')"><span class="nav-star">🧠</span><span>Sobre mim</span></div>
@@ -338,11 +343,11 @@ function limparClassesDeTodosModelos() {
     <p>Se quiser saber um pouco sobre os métodos utilizados basta clicar no método que queira para ver informações sobre ele.</p>
     <p>Na classificação o VERMELHO: FAKE  e VERDE: VERDADEIRO</p>
     <div class="metodos">
-      <button class="play-button-modelos-true" onclick="mostrarDescricao('Random Forest é um algoritmo de ensemble learning que constrói múltiplas árvores de decisão (árvores fracas) e combina suas previsões para gerar uma decisão mais robusta. Cada árvore é treinada em um subconjunto diferente dos dados (com reposição, via bootstrap) e utiliza um subconjunto aleatório de features. Isso reduz o risco de overfitting presente em modelos isolados. Sua força está na capacidade de capturar interações não-lineares e reduzir a variância sem aumentar significativamente o viés.')">Random Forest</button>
-      <button class="play-button-modelos-true" onclick="mostrarDescricao('Decision Tree é um modelo supervisionado baseado na estrutura de uma árvore binária, onde cada nó interno representa uma decisão baseada em um atributo, cada ramo representa o resultado da decisão, e cada folha representa uma classe. O algoritmo utiliza critérios como Gini ou Entropia (ID3, CART, etc.) para selecionar os melhores pontos de divisão. Embora interpretável e rápido, o modelo pode sofrer de overfitting se não for podado corretamente.')">Decision Tree</button>
-      <button class="play-button-modelos-false" onclick="mostrarDescricao('Logistic Regression é um modelo estatístico usado para classificação binária que estima a probabilidade de uma instância pertencer a uma classe com base na função sigmoide. Ele pressupõe uma relação linear entre as variáveis independentes e o logaritmo das chances (odds). É eficiente para tarefas lineares, como classificação de textos vetorizados, e fornece como saída a probabilidade da classe positiva, sendo bastante interpretável e escalável.')">Logistic Regression</button>
-      <button class="play-button-modelos-true" onclick="mostrarDescricao('Linear SVC é uma implementação linear do Support Vector Machine (SVM), que busca encontrar um hiperplano ótimo de separação entre as classes, maximizando a margem entre os vetores de suporte. Seu desempenho é excelente em espaços de alta dimensionalidade, como em classificações textuais. É menos sensível a outliers e robusto a dados esparsos, sendo especialmente eficiente com representações como TF-IDF ou BOW.')">Linear SVC</button>
-      <button class="play-button-modelos-false" onclick="mostrarDescricao('O Passive Aggressive é um algoritmo online learning que atualiza seus parâmetros apenas quando comete um erro (agressivo), mantendo-se inalterado em casos corretos (passivo). Sua eficiência em fluxos contínuos de dados e tarefas de classificação em tempo real, como detecção de spam e fake news, o torna valioso. Baseia-se na maximização de margem com regularização, o que permite ajustes rápidos sem necessidade de reprocessar o conjunto inteiro.')">Passive Aggressive</button>
+      <button class="play-button-modelo" data-modelo="rfc" onclick="mostrarDescricao('Random Forest é um algoritmo de ensemble learning que constrói múltiplas árvores de decisão (árvores fracas) e combina suas previsões para gerar uma decisão mais robusta. Cada árvore é treinada em um subconjunto diferente dos dados (com reposição, via bootstrap) e utiliza um subconjunto aleatório de features. Isso reduz o risco de overfitting presente em modelos isolados. Sua força está na capacidade de capturar interações não-lineares e reduzir a variância sem aumentar significativamente o viés.')">Random Forest</button>
+      <button class="play-button-modelo" data-modelo="dtc" onclick="mostrarDescricao('Decision Tree é um modelo supervisionado baseado na estrutura de uma árvore binária, onde cada nó interno representa uma decisão baseada em um atributo, cada ramo representa o resultado da decisão, e cada folha representa uma classe. O algoritmo utiliza critérios como Gini ou Entropia (ID3, CART, etc.) para selecionar os melhores pontos de divisão. Embora interpretável e rápido, o modelo pode sofrer de overfitting se não for podado corretamente.')">Decision Tree</button>
+      <button class="play-button-modelo" data-modelo="logreg" onclick="mostrarDescricao('Logistic Regression é um modelo estatístico usado para classificação binária que estima a probabilidade de uma instância pertencer a uma classe com base na função sigmoide. Ele pressupõe uma relação linear entre as variáveis independentes e o logaritmo das chances (odds). É eficiente para tarefas lineares, como classificação de textos vetorizados, e fornece como saída a probabilidade da classe positiva, sendo bastante interpretável e escalável.')">Logistic Regression</button>
+      <button class="play-button-modelo" data-modelo="svc" onclick="mostrarDescricao('Linear SVC é uma implementação linear do Support Vector Machine (SVM), que busca encontrar um hiperplano ótimo de separação entre as classes, maximizando a margem entre os vetores de suporte. Seu desempenho é excelente em espaços de alta dimensionalidade, como em classificações textuais. É menos sensível a outliers e robusto a dados esparsos, sendo especialmente eficiente com representações como TF-IDF ou BOW.')">Linear SVC</button>
+      <button class="play-button-modelo" data-modelo="pac" onclick="mostrarDescricao('O Passive Aggressive é um algoritmo online learning que atualiza seus parâmetros apenas quando comete um erro (agressivo), mantendo-se inalterado em casos corretos (passivo). Sua eficiência em fluxos contínuos de dados e tarefas de classificação em tempo real, como detecção de spam e fake news, o torna valioso. Baseia-se na maximização de margem com regularização, o que permite ajustes rápidos sem necessidade de reprocessar o conjunto inteiro.')">Passive Aggressive</button>
       </div>
     <div style="margin-top: 20px;">
       <textarea id="descricao-modelo" class="textarea" readonly>Para verificar sobre o modelo clique no botão quadrado acima!!</textarea>
@@ -357,7 +362,7 @@ function limparClassesDeTodosModelos() {
 <!-- Página 4: Sobre mim -->
 <div id="pagina4" style="display:none;">
   <header>
-    <div><img src="https://i.imgur.com/Ip6Z6EY.png" alt="Logo FatoML" style="height: 40px;vertical-align: middle;cursor: pointer;" onclick="limparClassesDeTodosModelos();irParaPagina('pagina1');"></div>
+    <div><img src="{{ url_for('static', filename='imagens/logo.png') }}" alt="Logo FatoML" style="height: 40px;vertical-align: middle;cursor: pointer;" onclick="limparClassesDeTodosModelos();irParaPagina('pagina1');"></div>
     <div class="stars">
       <div class="nav-item" onclick="irParaPagina('pagina2')"><span class="nav-star">🧠</span><span>Classificar</span></div>
       <div class="nav-item" onclick="irParaPagina('pagina4')"><span class="nav-star">🧠</span><span>Sobre mim</span></div>
@@ -373,8 +378,8 @@ function limparClassesDeTodosModelos() {
     <p>Para saber mais sobre como foi constuído o projeto aqui esta o link para o github do projeto:</p><a href="https://github.com/GuiRibCarra/FatoML_TCC" target="_blank">Git FatoML</a>
     </div>
     <div style="display: flex; justify-content: center; align-items: center; margin-top: 30px; gap: 20px;">
-    <img src="https://i.imgur.com/LV5l7QM.jpeg" alt="Imagem da FCT" style="margin-top: 20px; width: 300px;height: 200px">
-    <img src="https://i.imgur.com/H8RzYpC.jpeg" alt="Imagem do Estudante" style="margin-top: 20px; width: 150px; height: 200px">
+    <img src="{{ url_for('static', filename='imagens/fct.jpg') }}" alt="Imagem da FCT" style="margin-top: 20px; width: 300px;height: 200px">
+    <img src="{{ url_for('static', filename='imagens/eu.jpg') }}" alt="Imagem do Estudante" style="margin-top: 20px; width: 150px; height: 200px">
     </div>
     
   </main>
