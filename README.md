@@ -1,6 +1,6 @@
 # 🕵️‍♂️ FatoML - Detecção de Fake News com Machine Learning
 
-> Aplicação Web e API para análise de veracidade de notícias utilizando Processamento de Linguagem Natural (NLP) e múltiplos modelos de Classificação.
+> Aplicação Web e API desenvolvida para detecção de Fake News utilizando Processamento de Linguagem Natural (NLP), vetorização TF-IDF e múltiplos modelos de Machine Learning treinados e avaliados em ambiente experimental.
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue?style=for-the-badge&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-Web_Framework-red?style=for-the-badge&logo=flask&logoColor=white)
@@ -11,6 +11,8 @@
 O **FatoML** é uma ferramenta desenvolvida para auxiliar no combate à desinformação. O sistema recebe um texto de notícia e o submete a **5 algoritmos de Machine Learning** diferentes simultaneamente, retornando a classificação (Falso/Verdadeiro) de cada um para maior confiabilidade.
 
 Este projeto faz parte do portfólio de Ciência da Computação, demonstrando o ciclo completo de Ciência de Dados: desde a Análise Exploratória (EDA) até o deploy do modelo em uma aplicação web.
+
+🎓 Projeto desenvolvido como Trabalho de Conclusão de Curso (TCC) do Bacharelado em Ciência da Computação na UNESP.
 
 ## 🧠 Modelos Implementados
 O sistema utiliza os seguintes algoritmos treinados (serializados em `.pkl`):
@@ -76,4 +78,4 @@ Recebe um texto e retorna a classificação de todos os modelos.
 * Frontend: HTML5, CSS3.
 * Análise de Dados: Pandas, Jupyter Notebook.
 
-Desenvolvido por GuiRibCarra.
+Desenvolvido por Guilherme Ribeiro Carrara.
